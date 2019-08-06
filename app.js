@@ -49,9 +49,9 @@ passport.use(new GitHubStrategy({
   function (accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
       User.upsert({
-        userId: profile.id,
         username: profile.username,
-        authProvider: profile.provider
+        authProvider: profile.provider,
+        providedUserId: profile.id
       }).then(() => {
         done(null, profile);
       });
@@ -66,9 +66,9 @@ passport.use(new GoogleStrategy({
   function (token, tokenSecret, profile, done) {
     process.nextTick(function () {
       User.upsert({
-        userId: profile.id,
-        username: profile.displayName,
-        authProvider: profile.provider
+        username: profile.name.givenName,
+        authProvider: profile.provider,
+        providedUserId: profile.id
       }).then(() => {
         done(null, profile);
       });
@@ -79,6 +79,7 @@ passport.use(new GoogleStrategy({
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
 var logoutRouter = require('./routes/logout');
+var schedulesRouter = require('./routes/schedules');
 
 var app = express();
 app.use(helmet());
@@ -100,6 +101,7 @@ app.use(passport.session())
 app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
+app.use('/schedules', schedulesRouter);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }),

@@ -5,4 +5,4 @@ block content
   br
   a(href="/auth/google") googleでログイン
   if user
-    p 現在 #{user.username || user.displayName} (#{user.provider})でログイン中
+    p 現在 #{user.username || user.name.givenName || user.name.familyName} (#{user.provider})でログイン中

@@ -4,8 +4,9 @@ const Sequelize = loader.Sequelize;
 
 const User = loader.database.define('users', {
   userId: {
-    type: Sequelize.DECIMAL,
+    type: Sequelize.INTEGER,
     primaryKey: true,
+    autoIncrement: true,
     allowNull: false
   },
   username: {
@@ -14,6 +15,10 @@ const User = loader.database.define('users', {
   },
   authProvider: {
     type: Sequelize.STRING,
+    allowNull: false
+  },
+  providedUserId:{
+    type: Sequelize.DECIMAL,
     allowNull: false
   }
 }, {
