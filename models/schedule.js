@@ -17,12 +17,17 @@ const Schedule = loader.database.define('schedules', {
     allowNull: false
   },
   createdBy: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.DECIMAL,
     allowNull: false
   },
   updatedAt: {
     type: Sequelize.DATE,
     allowNull: false
+  },
+  openFlag:{
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
   }
 }, {
     freezeTableName: true,

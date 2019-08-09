@@ -2,24 +2,34 @@
 const loader = require('./sequelize-loader');
 const Sequelize = loader.Sequelize;
 
-const Comment = loader.database.define('comments', {
-  scheduleId: {
-    type: Sequelize.UUID,
-    primaryKey: true,
-    allowNull: false
-  },
-  userId: {
+const Availability = loader.database.define('availabilities', {
+  candidateId: {
     type: Sequelize.INTEGER,
     primaryKey: true,
     allowNull: false
   },
-  comment: {
-    type: Sequelize.STRING,
+  userId: {
+    type: Sequelize.DECIMAL,
+    primaryKey: true,
+    allowNull: false
+  },
+  availability: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  scheduleId: {
+    type: Sequelize.UUID,
     allowNull: false
   }
 }, {
     freezeTableName: true,
-    timestamps: false
+    timestamps: false,
+    indexes: [
+      {
+        fields: ['scheduleId']
+      }
+    ]
   });
 
-module.exports = Comment;
+module.exports = Availability;

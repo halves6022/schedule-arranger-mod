@@ -49,9 +49,9 @@ passport.use(new GitHubStrategy({
   function (accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
       User.upsert({
+        userId: profile.id,
         username: profile.username,
         authProvider: profile.provider,
-        providedUserId: profile.id
       }).then(() => {
         done(null, profile);
       });
@@ -66,9 +66,9 @@ passport.use(new GoogleStrategy({
   function (token, tokenSecret, profile, done) {
     process.nextTick(function () {
       User.upsert({
-        username: profile.name.givenName,
+        userId: profile.id,
+        username: profile.name.givenName || profile.name.familyName,
         authProvider: profile.provider,
-        providedUserId: profile.id
       }).then(() => {
         done(null, profile);
       });
@@ -80,6 +80,8 @@ var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
 var logoutRouter = require('./routes/logout');
 var schedulesRouter = require('./routes/schedules');
+var availabilitiesRouter = require('./routes/availabilities');
+var commentsRouter = require('./routes/comments');
 
 var app = express();
 app.use(helmet());
@@ -102,6 +104,8 @@ app.use('/', indexRouter);
 app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 app.use('/schedules', schedulesRouter);
+app.use('/schedules', availabilitiesRouter);
+app.use('/schedules', commentsRouter);
 
 app.get('/auth/github',
   passport.authenticate('github', { scope: ['user:email'] }),
@@ -110,8 +114,15 @@ app.get('/auth/github',
 app.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/login' }),
   function (req, res) {
-    res.redirect('/');
-  })
+    var loginFrom = req.cookies.loginFrom;
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom &&
+      !loginFrom.includes('http://') &&
+      !loginFrom.includes('https://')) {
+      res.clearCookie('loginFrom');
+      res.redirect(loginFrom);
+    } else { res.redirect('/'); }
+  });
 
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login'] }),
@@ -121,7 +132,14 @@ app.get('/auth/google',
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   function (req, res) {
-    res.redirect('/');
+    var loginFrom = req.cookies.loginFrom;
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom &&
+      !loginFrom.includes('http://') &&
+      !loginFrom.includes('https://')) {
+      res.clearCookie('loginFrom');
+      res.redirect(loginFrom);
+    } else { res.redirect('/'); }
   });
 
 // catch 404 and forward to error handler

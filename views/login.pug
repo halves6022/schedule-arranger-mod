@@ -1,8 +1,7 @@
 extends layout
 
 block content
-  a(href="/auth/github") GitHubでログイン
-  br
-  a(href="/auth/google") googleでログイン
-  if user
-    p 現在 #{user.username || user.name.givenName || user.name.familyName} (#{user.provider})でログイン中
+  div
+    a(href="/auth/github").btn.btn-info.my-3 GitHubでログイン
+  div
+    a(href="/auth/google").btn.btn-info.my-3 googleでログイン
